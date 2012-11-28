@@ -1,6 +1,6 @@
 <apex:page controller="MarkDonationsThankedController">
   <!-- Begin Default Content REMOVE THIS -->
-  <h1>Donor Recognition</h1>
+  <h1>Donor Recognition TEST</h1>
   
   <br /><br />
   <!-- apex:outputLink value="/00OE0000001Sg3Y" target="_blank">View a report of steward assignments</apex:outputLink><br /><br / -->
