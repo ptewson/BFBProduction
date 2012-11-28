@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>BATCH_DonorClassRollups</members>
+        <members>CNTRL_DonorClassRollup</members>
+        <members>DonorClassificationRollups</members>
+        <members>HHDonorClassificationRollups</members>
+        <members>MarkDonationsThankedController</members>
+        <members>ScheduledDonorClassification</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>DonorClassRollup</members>
+        <members>MarkDonationsThanked</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>DonorClassificationOpportunityRollup</members>
+        <name>ApexTrigger</name>
+    </types>
+    <version>25.0</version>
+</Package>

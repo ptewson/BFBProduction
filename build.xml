@@ -1,0 +1,54 @@
+<project name="Simple tools for Salesforce Ant tasks" default="test" basedir="." xmlns:sf="antlib:com.salesforce">
+
+    <property file="build.properties"/>
+    <property environment="env"/>
+
+
+    <target name="retrievesrc">
+      <mkdir dir="src"/>
+      <!-- Retrieve the contents into another directory -->
+      <sf:retrieve username="${sfsandbox.username}" password="${sfsandbox.password}" serverurl="${sfsandbox.serverurl}" retrieveTarget="src" unpackaged="src/package.xml"/>
+    </target>
+
+    <target name="deploy">
+      <!-- Upload the contents of the "src" package -->
+      <sf:deploy username="${sfsandbox.username}" password="${sfsandbox.password}" serverurl="${sfsandbox.serverurl}" deployRoot="src"/>
+    </target>
+
+
+    <target name="test">
+      <sf:deploy username="${sfsandbox.username}" password="${sfsandbox.password}" serverurl="${sfsandbox.serverurl}" deployRoot="src" runAllTests="true" logType="Debugonly" checkOnly="true"/>
+    </target>
+
+    <target name="testDonorClassification">
+      <sf:deploy username="${sfsandbox.username}" password="${sfsandbox.password}" serverurl="${sfsandbox.serverurl}" deployRoot="src" logType="Debugonly" checkOnly="true">
+	<runTest>HHDonorClassificationRollups</runTest>
+      </sf:deploy>
+    </target>
+
+
+    <target name="retrievesrc-prod">
+      <mkdir dir="src"/>
+      <!-- Retrieve the contents into another directory -->
+      <sf:retrieve username="${sfprod.username}" password="${sfprod.password}" serverurl="${sfprod.serverurl}" retrieveTarget="src" unpackaged="src/package.xml"/>
+    </target>
+
+    <target name="deploy-prod">
+      <!-- Upload the contents of the "src" package -->
+      <sf:deploy username="${sfprod.username}" password="${sfprod.password}" serverurl="${sfprod.serverurl}" deployRoot="src"/>
+    </target>
+
+
+    <target name="test-prod">
+      <sf:deploy username="${sfprod.username}" password="${sfprod.password}" serverurl="${sfprod.serverurl}" deployRoot="src" runAllTests="true" logType="Debugonly" checkOnly="true"/>
+    </target>
+
+    <target name="testDonorClassification-prod">
+      <sf:deploy username="${sfprod.username}" password="${sfprod.password}" serverurl="${sfprod.serverurl}" deployRoot="src" logType="Debugonly" checkOnly="true">
+	<runTest>HHDonorClassificationRollups</runTest>
+      </sf:deploy>
+    </target>
+
+    
+
+</project>

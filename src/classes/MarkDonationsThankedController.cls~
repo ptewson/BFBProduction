@@ -1,0 +1,138 @@
+public with sharing class MarkDonationsThankedController {
+	public List<TableRow> tableRows { get; set; }
+	public List<Contact> allStewardedContacts { get; set; } 
+	
+	public class TableRow {
+		public Contact theContact { get; set; }
+		public Opportunity theDonation { get; set; }	
+	
+		public TableRow(Opportunity o, Contact c) {
+			theDonation = o;
+			theContact = c;
+		}
+		 
+		public void updateThis() {
+			//update theContact;
+			update theDonation; 
+		}
+	}
+	 
+
+	public String donorSteward;
+	
+	public String getDonorSteward() {
+		return donorSteward;  
+	}
+	
+	public void setDonorSteward(String donorSteward) {
+		this.donorSteward = donorSteward;
+	}
+	
+	public String getInfo(){
+		return 'this is REALLY the controller text';
+	}
+	
+	public PageReference invokeService() { 
+		Opportunity[] donations;
+	
+		// opp ID and corresponding contact ID
+		Map<Id, Id> donorContactIDMap = new Map<Id, Id>();
+	
+		// contact ID and corresponding contact
+		Map<Id, Contact> contactMap = new Map<Id, Contact>();
+
+		//String donorSteward = System.currentPageReference().getParameters().get('donorsteward');
+		donations = [select Name, Id, CloseDate, Amount, StageName, Donor_Called__c,  
+			(select OpportunityId from OpportunityContactRoles) from Opportunity 
+				where Opportunity.Donor_Called__c != True and id in 
+					(Select OpportunityId from OpportunityContactRole where ContactId != '' and
+						 Contact.Contact_Preference__c != 'No Contact' and Contact.Deceased__c != true and
+						 Contact.Donor_Steward__c =: donorSteward)];
+
+		for(Opportunity opp: donations) {
+			donorContactIDMap.put(opp.id, null);
+		}
+		for(OpportunityContactRole ocr: [select ContactID, OpportunityID from OpportunityContactRole 
+			where OpportunityContactRole.OpportunityId in :donorContactIDMap.keySet()]) {
+				donorContactIDMap.put(ocr.OpportunityID, ocr.ContactId);				
+			}
+			
+		for(Contact c: [select Name, Id, email, Phone, MailingStreet, MailingCity, MailingState, MailingPostalCode
+			from Contact where id in :donorContactIdMap.values()]) {
+				contactMap.put(c.id, c);
+			}
+		
+		//if(!donorSteward.equals('')) {
+		if(donorSteward != null) {
+			allStewardedContacts = [select Name, Id, email, Phone, MailingStreet, MailingCity, MailingState, MailingPostalCode 
+				from Contact where Donor_Steward__c =: donorSteward];
+		} else {
+			allStewardedContacts = null;
+		}
+		List<TableRow> rows = new List<TableRow>();
+		for(Opportunity o: donations) {
+			rows.add(new TableRow(o, contactMap.get(donorContactIDMap.get(o.id))));
+		}
+		
+		tableRows = rows;
+		
+		return null; 
+	}
+	
+	public PageReference markThanked() { 
+		for(TableRow row: tableRows) row.updateThis();
+		return invokeService();
+	}
+		
+	public List<SelectOption> getDonorStewards() {
+		List<SelectOption> options = new List<SelectOption>();
+		options.add(new SelectOption('None','Select your name'));
+		options.add(new SelectOption('','No Specified Donor Steward'));
+		Schema.DescribeFieldResult fieldResult = Contact.Donor_Steward__c.getDescribe();
+		List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+		for(Schema.PicklistEntry p : ple)
+			options.add(new SelectOption(p.getValue(),p.getValue()));
+		return options;
+	}
+	
+	static testMethod void testController() {
+		MarkDonationsThankedController mdtc = new MarkDonationsThankedController();
+		//mdtc.getDonations();
+		//mdtc.getDonorStewards();
+				
+		mdtc.setDonorSteward('bob');
+		
+		List<SelectOption> options = mdtc.getDonorStewards();
+		
+		mdtc.invokeService();
+		System.assertEquals('bob',mdtc.getDonorSteward());
+		//System.assertEquals(mdtc.getInfo(),  'this is the controller text');
+	}
+}
+
+
+
+	
+	/*
+	public Opportunity[] getDonations() {
+		return donations;
+	}
+	
+	public void setDonations(Opportunity[] opps) {
+		donations = opps;
+	}
+	*/
+
+
+
+
+		/*
+		for(Contact c: [select Name, email, MailingStreet, MailingCity, MailingState, MailingPostalCode 
+			from Contact where id in 
+				(select ContactID from OpportunityContactRole  
+					where OpportunityContactRole.OpportunityId in :donorContactMap.keySet() 
+						and OpportunityContactRole.IsPrimary = True)]) {
+							donorContactMap.put(????????, c);
+						}
+		*/				
+		//return [select Name, id from Opportunity where Opportunity.Donor_Thanked__c = True];
