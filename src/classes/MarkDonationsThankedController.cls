@@ -134,8 +134,14 @@ public with sharing class MarkDonationsThankedController {
 
 
 		// account ID and corresponding account
-                Map<Id,Account> accounts = new Map<Id,Account>([select Id, Name, Phone, BillingStreet, BillingCity, BillingState, BillingPostalCode 
-                              from Account where Name != 'Individual' and Donor_Steward__c =: donorSteward limit 100]);
+                Map<Id,Account> accounts = new Map<Id,Account>();
+                if(filterBlankPhone) {
+                  accounts = new Map<Id,Account>([select Id, Name, Phone, BillingStreet, BillingCity, BillingState, BillingPostalCode 
+                    from Account where Name != 'Individual' and Phone != '' and Donor_Steward__c =: donorSteward limit 100]);
+                } else {
+                  accounts = new Map<Id,Account>([select Id, Name, Phone, BillingStreet, BillingCity, BillingState, BillingPostalCode 
+                    from Account where Name != 'Individual' and Donor_Steward__c =: donorSteward limit 100]);
+                }
                 // opp ID and the corresponding opp
                 Map<Id,Opportunity> orgDonations = new Map<Id,Opportunity>([select Id, AccountId, Name, CloseDate, Amount, StageName, Donor_Called__c from Opportunity where Donor_Called__c != True and StageName = 'Closed Won' and AccountId =: accounts.keySet() limit 100]);
 
