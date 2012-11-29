@@ -1,6 +1,6 @@
 <apex:page controller="MarkDonationsThankedController">
   <!-- Begin Default Content REMOVE THIS -->
-  <h1>Donor Recognition GIT</h1>
+  <h1>Donor Recognition</h1>
   
   <br /><br />
   <!-- apex:outputLink value="/00OE0000001Sg3Y" target="_blank">View a report of steward assignments</apex:outputLink><br /><br / -->
@@ -16,6 +16,10 @@
   		<apex:actionSupport event="onchange" action="{!invokeService}" rerender="resultPanel"/>
   		<apex:selectOptions value="{!DonorClassifications}"/>
   	</apex:selectList>
+  	<apex:outputLabel value="Filter out records without valid Phone? " for="filterPhone" />
+	<apex:inputCheckbox id="filterPhone" value="{!filterBlankPhone}">
+  		<apex:actionSupport event="onchange" action="{!invokeService}" rerender="resultPanel"/>
+	</apex:inputCheckbox>
   </apex:form>
 
   <br /> 
