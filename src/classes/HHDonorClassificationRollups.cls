@@ -174,13 +174,18 @@ public with sharing class HHDonorClassificationRollups {
                         }
 
                         Double lastYearGiving = 0;
-		        Date todaysDate = Date.today().addYears(-1);
+                        Date todaysDate = Date.today();
+		        Date aYearAgo = Date.today().addYears(-1);
                         // override
                         if(!alwaysMajorDonor) {
-                          // 'Major Donor' means >= 1000 dollars giving in the last calendar year
-                          Integer lastYear = todaysDate.year();
-                          for(Opportunity opp: householdsAndDonations.get(hh.id)) {
-                            if(opp.closeDate.year() == lastYear) {
+                          // 'Major Donor' means > 1000 dollars giving in the 12 months preceeding current year
+                          //Integer lastYear = todaysDate.year();
+ 			  for(Opportunity opp : householdsAndDonations.get(hh.id)) {
+                            //if(opp.closeDate.year() == lastYear) {
+                            //System.debug(' ********* opp date: '+opp.CloseDate+', a year ago: '+aYearAgo+', today: '+todaysDate);
+                            //System.debug(' ********* Days between a year ago: '+opp.closeDate.daysBetween(AYearAgo));
+                            //System.debug(' ********* Days between today: '+opp.closeDate.daysBetween(todaysDate));
+                            if(opp.closeDate.daysBetween(AYearAgo) < 0 && opp.closeDate.daysBetween(todaysDate) >= 0) {
                               lastYearGiving += opp.Amount;
                               System.debug(' ********* total giving for donor, opp amount: '+lastYearGiving+', '+opp.Amount);
                             }
@@ -612,7 +617,7 @@ public with sharing class HHDonorClassificationRollups {
                 insert individual;
 
                 // Test Monthly Donor
-                Date today = Date.today().addYears(-1);
+                Date today = Date.today().addDays(-180);
                 List<Opportunity> opps = new List<Opportunity>();
                 List<OpportunityContactRole> ocrs = new List<OpportunityContactRole>();
                 for(Integer i=0; i<6; i++) {
