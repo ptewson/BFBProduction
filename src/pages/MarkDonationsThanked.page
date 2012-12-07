@@ -1,5 +1,5 @@
 <apex:page controller="MarkDonationsThankedController">
-  <h1>Donor Recognition PAGE</h1>
+  <h1>Donor Recognition</h1>
   
   <br /><br />
   <!-- apex:outputLink value="/00OE0000001Sg3Y" target="_blank">View a report of steward assignments</apex:outputLink><br /><br / -->
@@ -11,7 +11,7 @@
   		<apex:selectOptions value="{!DonorStewards}"/>
   	</apex:selectList>
   	<apex:outputLabel value="Please Select Donor Classification: " for="DonorClassification" />
-  	<apex:selectList value="{!donorClassification}" id="DonorClassification" size="1">
+  	<apex:selectList value="{!donorClassification}" id="DonorClassification" size="1" multiselect="true">
   		<apex:actionSupport event="onchange" action="{!invokeService}" rerender="resultPanel"/>
   		<apex:selectOptions value="{!DonorClassifications}"/>
   	</apex:selectList>

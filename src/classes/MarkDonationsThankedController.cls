@@ -70,41 +70,40 @@ public with sharing class MarkDonationsThankedController {
 		Map<Id, Contact> contactMap = new Map<Id, Contact>();
                 if(donorClassification == null) donorClassification = '';
 		//String donorSteward = System.currentPageReference().getParameters().get('donorsteward');
-                if(filterBlankPhone) {
-                  if(donorClassification.equals('All')) {
-		    donations = [select o.AccountId, a.Name, o.Name, o.Id, o.CloseDate, o.Amount, o.StageName, o.Donor_Called__c, o.Program__c,
-		      (select OpportunityId, IsPrimary from OpportunityContactRoles where IsPrimary = True) from Opportunity o, o.Account a
-		      where Opportunity.Donor_Called__c != True and (a.Name = 'Individual' or o.AccountId = null) and o.StageName = 'Closed Won' and id in 
-		      (Select OpportunityId from OpportunityContactRole where ContactId != '' and Contact.Phone != '' and
-		      Contact.Contact_Preference__c != 'No Contact' and Contact.Deceased__c != true and
-		      Contact.Donor_Steward__c =: donorSteward) limit 30];
-                  } else {
-		    donations = [select o.AccountId, a.Name, o.Name, o.Id, o.CloseDate, o.Amount, o.StageName, o.Donor_Called__c, o.Program__c, 
-		      (select OpportunityId, IsPrimary from OpportunityContactRoles where IsPrimary = True) from Opportunity o, o.Account a
-		      where Opportunity.Donor_Called__c != True and (a.Name = 'Individual' or o.AccountId = null) and o.StageName = 'Closed Won' and id in 
-		      (Select OpportunityId from OpportunityContactRole where ContactId != '' and Contact.Phone != '' and
-		      Contact.Contact_Preference__c != 'No Contact' and Contact.Deceased__c != true and 
-                      Contact.Donor_Classification__c like :('%'+donorClassification+'%') and
-		      Contact.Donor_Steward__c =: donorSteward) limit 30];
-                  }
-                } else {
-                  if(donorClassification.equals('All')) {
-		    donations = [select o.AccountId, a.Name, o.Name, o.Id, o.CloseDate, o.Amount, o.StageName, o.Donor_Called__c, o.Program__c,
-		      (select OpportunityId, IsPrimary from OpportunityContactRoles where IsPrimary = True) from Opportunity o, o.Account a
-		      where Opportunity.Donor_Called__c != True and (a.Name = 'Individual' or o.AccountId = null) and o.StageName = 'Closed Won' and id in 
-		      (Select OpportunityId from OpportunityContactRole where ContactId != '' and 
-		      Contact.Contact_Preference__c != 'No Contact' and Contact.Deceased__c != true and
-		      Contact.Donor_Steward__c =: donorSteward) limit 30];
-                  } else {
-		    donations = [select o.AccountId, a.Name, o.Name, o.Id, o.CloseDate, o.Amount, o.StageName, o.Donor_Called__c, o.Program__c, 
-		      (select OpportunityId, IsPrimary from OpportunityContactRoles where IsPrimary = True) from Opportunity o, o.Account a
-		      where Opportunity.Donor_Called__c != True and (a.Name = 'Individual' or o.AccountId = null) and o.StageName = 'Closed Won' and id in 
-		      (Select OpportunityId from OpportunityContactRole where ContactId != '' and 
-		      Contact.Contact_Preference__c != 'No Contact' and Contact.Deceased__c != true and 
-                      Contact.Donor_Classification__c like :('%'+donorClassification+'%') and
-		      Contact.Donor_Steward__c =: donorSteward) limit 30];
+
+                String queryString = '';
+
+                queryString = 'select o.AccountId, a.Name, o.Name, o.Id, o.CloseDate, o.Amount, o.StageName, o.Donor_Called__c, o.Program__c, ';
+                queryString += '(select OpportunityId, IsPrimary from OpportunityContactRoles where IsPrimary = True) from Opportunity o, o.Account a ';
+                queryString += 'where Opportunity.Donor_Called__c != True and (a.Name = \'Individual\' or o.AccountId = null) and o.StageName = \'Closed Won\' and id in ';
+                queryString += '(Select OpportunityId from OpportunityContactRole where ContactId != \'\' and ';
+
+                if(filterBlankPhone) queryString += 'Contact.Phone != \'\' and ';
+
+                queryString += 'Contact.Contact_Preference__c != \'No Contact\' and Contact.Deceased__c != true and ';
+                System.debug(' ********* Donor Classification Multi-Select results: '+donorClassification);
+
+                Integer i = 0;
+                donorClassification = donorClassification.replace('[','');
+                donorClassification = donorClassification.replace(']','');
+                if(!donorClassification.equals('All') && !donorClassification.equals('')) {
+                  queryString += '(';
+                  String[] donorClassifications = donorClassification.split(', ',0);
+                  for(String donorClass: donorClassifications) {
+                    i++;
+                    //donorClass = '%' + donorClass + '%';
+                    queryString += 'Contact.Donor_Classification__c like \'%'+donorClass+'%\' ';
+                    if(i < donorClassifications.size()) queryString += 'or ';
+                    else queryString += ') and ';
                   }
                 }
+
+                queryString += 'Contact.Donor_Steward__c =: donorSteward) limit 30';
+
+                System.debug(' ********* QUERY: '+queryString);
+
+                donations = Database.query(queryString);
+
 		for(Opportunity opp: donations) {
 			donorContactIDMap.put(opp.id, null);
 		}

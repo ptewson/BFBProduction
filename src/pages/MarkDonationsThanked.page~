@@ -4,7 +4,7 @@
   
   <br /><br />
   <!-- apex:outputLink value="/00OE0000001Sg3Y" target="_blank">View a report of steward assignments</apex:outputLink><br /><br / -->
-    
+
   <apex:form >
   	<apex:outputLabel value="Please Select Donor Steward: " for="DonorSteward" />
   	<apex:selectList value="{!donorSteward}" id="DonorSteward" size="1">
@@ -16,14 +16,18 @@
   		<apex:actionSupport event="onchange" action="{!invokeService}" rerender="resultPanel"/>
   		<apex:selectOptions value="{!DonorClassifications}"/>
   	</apex:selectList>
+  	<apex:outputLabel value="Filter out records without valid Phone? " for="filterPhone" />
+	<apex:inputCheckbox id="filterPhone" value="{!filterBlankPhone}">
+  		<apex:actionSupport event="onchange" action="{!invokeService}" rerender="resultPanel"/>
+	</apex:inputCheckbox>
   </apex:form>
-  
+
   <br /> 
   
   <apex:pageBlock >
   <apex:outputPanel id="resultPanel">
   <apex:form id="markThankedForm" rendered="{!loadedDonations}">
-  <apex:outputLabel value="Dononations Requiring Action" for="resultPanel" />
+  <apex:outputLabel value="Donations Requiring Action" for="resultPanel" />
   <br />  <br />
   <h2>When donor has been called, click the checkbox to mark the corresponding donation as "called" and then click the "Submit" button to make the change final</h2>
   <br />  <br />
@@ -41,7 +45,7 @@
      <apex:column headerValue="Household"><apex:outputLink value="/{!row.theContact.npo02__Household__c}" target="_blank">{!row.theContact.npo02__Household__r.Name}</apex:outputLink></apex:column>
      <!-- apex:column value="{!row.theContact.Email}" / -->
      <apex:column value="{!row.theContact.Phone}" />
-     <apex:column value="{!row.theContact.Donor_Classification__c}" />
+     <apex:column value="{!row.theContact.Donor_Classification__c}" /> 
      <apex:column value="{!row.theDonation.Program__c}" />
      <apex:column value="{!row.theContact.MailingStreet}" />
      <apex:column value="{!row.theContact.MailingCity}" />
@@ -71,14 +75,16 @@
   </apex:pageBlockTable>
     <apex:commandButton action="{!markThanked}" rerender="resultPanel" value="Submit"/>
   
+  </apex:form>
+
   <br /><br />
   <h2>All Donors attached to this steward</h2>
   <br />
-  </apex:form>
 
   <apex:pageBlockTable rendered="{!allStewardedContacts != null}" value="{!allStewardedContacts}" var="contact">
      <apex:column headerValue="Contact"><apex:outputLink value="/{!contact.Id}" target="_blank">{!contact.Name}</apex:outputLink></apex:column>
-     <apex:column headerValue="Household"><apex:outputLink value="/{!contact.npo02__Household__c}" target="_blank">{!contact.npo02__Household__r.Name}</apex:outputLink></apex:column>     <apex:column value="{!contact.Donor_Classification__c}" />
+     <apex:column headerValue="Household"><apex:outputLink value="/{!contact.npo02__Household__c}" target="_blank">{!contact.npo02__Household__r.Name}</apex:outputLink></apex:column>     
+     <apex:column value="{!contact.Donor_Classification__c}" />
      <apex:column value="{!contact.npo02__LastCloseDate__c}" />
      <apex:column value="{!contact.npo02__LastOppAmount__c}" />
      <apex:column value="{!contact.Phone}" />
